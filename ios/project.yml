@@ -1,0 +1,73 @@
+name: Foredeck
+
+options:
+  bundleIdPrefix: com.example
+  deploymentTarget:
+    iOS: "17.0"
+  createIntermediateGroups: true
+  groupSortPosition: top
+
+packages:
+  ForedeckCore:
+    path: ForedeckCore
+
+targets:
+  Foredeck:
+    type: application
+    platform: iOS
+    sources:
+      - path: Foredeck
+    dependencies:
+      - package: ForedeckCore
+        product: ForedeckCore
+    settings:
+      base:
+        PRODUCT_BUNDLE_IDENTIFIER: com.example.foredeck
+        PRODUCT_NAME: Foredeck
+        MARKETING_VERSION: "0.1.0"
+        CURRENT_PROJECT_VERSION: "1"
+        SWIFT_VERSION: "5.9"
+        # iPhone only. This is a one-handed tool used standing up.
+        TARGETED_DEVICE_FAMILY: "1"
+        INFOPLIST_KEY_UILaunchScreen_Generation: YES
+        INFOPLIST_KEY_UISupportedInterfaceOrientations: UIInterfaceOrientationPortrait
+        ENABLE_USER_SCRIPT_SANDBOXING: YES
+    info:
+      path: Foredeck/Info.plist
+      properties:
+        CFBundleDisplayName: Foredeck
+        CFBundleShortVersionString: "$(MARKETING_VERSION)"
+        CFBundleVersion: "$(CURRENT_PROJECT_VERSION)"
+
+        # Every one of these is load bearing. A missing usage description is a
+        # crash on first use; a missing NSBonjourServices entry means iOS 14+
+        # silently blocks Multipeer discovery and the crew simply never find
+        # each other, with no error anywhere.
+        NSMicrophoneUsageDescription: >-
+          Foredeck uses the microphone so the crew can hear each other while
+          docking and anchoring.
+        NSLocalNetworkUsageDescription: >-
+          Foredeck finds the rest of the crew's phones over the boat's network.
+        NSBonjourServices:
+          - _foredeck-v1._tcp
+          - _foredeck-v1._udp
+          - _signalk-ws._tcp
+        NSLocationWhenInUseUsageDescription: >-
+          Foredeck shows the crew where the boat is relative to the anchor.
+        NSLocationAlwaysAndWhenInUseUsageDescription: >-
+          The anchor alarm needs to keep watching your position while the app is
+          in the background, so it can wake you if the boat drags.
+        NSCameraUsageDescription: >-
+          Used only to scan another crew member's pairing QR code.
+
+        # audio keeps the process alive with the screen locked, which is what
+        # keeps both the intercom and the networking running when the phone goes
+        # into a pocket. location does the same for the anchor alarm.
+        UIBackgroundModes:
+          - audio
+          - location
+
+        CFBundleURLTypes:
+          - CFBundleURLName: com.example.foredeck.join
+            CFBundleURLSchemes:
+              - foredeck
